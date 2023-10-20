@@ -18,9 +18,10 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 		<!--web依赖，结合dubbo后删除-->
-        <dependency>
+        <!--<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+        </dependency>-->
+
     </dependencies>
 </project>

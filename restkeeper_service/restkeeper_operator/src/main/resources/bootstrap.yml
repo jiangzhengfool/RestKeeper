@@ -3,25 +3,26 @@ spring:
     name: operator-dubbo-provider
   profiles:
     active: dev
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/restkeeper_operator?serverTimezone=Asia/Shanghai
-    username: root
-    password: root
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://192.168.200.128:3306/restkeeper_operator?serverTimezone=Asia/Shanghai
+#    username: root
+#    password: root
   cloud:
     nacos:
       discovery:
-        server-addr: 192.168.200.140:8848
+        server-addr: 192.168.60.53:8849
       config:
-        server-addr: 192.168.200.140:8848
+        server-addr: 192.168.60.53:8849
         file-extension: yml
         prefix: operator-dubbo-provider
-        enabled: false #关闭config
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-logging:
-  level:
-    com.restkeeper.operator: debug
+        shared-dataids: common.yml
+        refreshable-dataids: common.yml
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+#logging:
+#  level:
+#    com.restkeeper.operator: debug
