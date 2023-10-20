@@ -1,0 +1,8 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.60.53:13306/restkeeper_operator?serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456

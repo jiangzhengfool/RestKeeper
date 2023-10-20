@@ -1,0 +1,13 @@
+#设置dubbo支持
+dubbo:
+  registry:
+    address: spring-cloud://192.168.200.128
+  cloud:
+    subscribed-services: operator-dubbo-provider
+  protocols:
+    dubbo:
+      port: -1
+      name: dubbo
+      serialization: kryo
+  consumer:
+    timeout: 600000

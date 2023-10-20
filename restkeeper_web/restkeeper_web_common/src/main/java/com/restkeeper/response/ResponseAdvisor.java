@@ -1,5 +1,6 @@
 package com.restkeeper.response;
 
+import com.alibaba.fastjson.JSON;
 import com.restkeeper.response.exception.ExceptionResponse;
 import com.restkeeper.response.vo.PageVO;
 import com.restkeeper.utils.Result;
@@ -42,6 +43,12 @@ public class ResponseAdvisor implements ResponseBodyAdvice<Object> {
             return body;
         }
 
+        if (body instanceof String) {
+            //这里注意是将result转换为json字符串
+            String result =  JSON.toJSONString(body);
+            return JSON.toJSONString(body);
+        }
+
         if (body instanceof Boolean){
             boolean result = (boolean)body;
             return new BaseResponse<Boolean>(result);
@@ -50,6 +57,7 @@ public class ResponseAdvisor implements ResponseBodyAdvice<Object> {
         if (body instanceof PageVO){
             return new BaseResponse<>(body);
         }
+
 
         if (body instanceof ExceptionResponse){
             return new BaseResponse<>(400,((ExceptionResponse)body).getMsg());
