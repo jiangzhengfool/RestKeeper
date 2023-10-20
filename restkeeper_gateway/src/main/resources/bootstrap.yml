@@ -12,5 +12,8 @@ spring:
         server-addr: 192.168.60.53:8849
         file-extension: yml
         prefix: gateway
+        shared-dataids: common.yml
+        #哪些共享配置支持动态刷新，如多个使用逗号分隔
+        refreshable-dataids: common.yml
 server:
   port: 8085

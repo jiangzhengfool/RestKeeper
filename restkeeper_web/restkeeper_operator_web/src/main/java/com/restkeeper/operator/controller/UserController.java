@@ -99,6 +99,7 @@ public class UserController{
      */
     @ApiOperation(value = "登录校验")
     @PostMapping("/login")
+    @ApiImplicitParam(name = "Authorization", value = "jwt token", required = false, dataType = "String",paramType="header")
     public Result login(@RequestBody LoginVO loginVO){
         return operatorUserService.login(loginVO.getLoginName(),loginVO.getLoginPass());
     }

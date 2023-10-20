@@ -4,18 +4,30 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Maps;
 import com.restkeeper.operator.entity.OperatorUser;
 import com.restkeeper.operator.mapper.OperatorUserMapper;
+import com.restkeeper.utils.JWTUtil;
 import com.restkeeper.utils.MD5CryptUtil;
 import com.restkeeper.utils.Result;
 import com.restkeeper.utils.ResultCode;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.Service;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+
+import java.util.Map;
 
 //@Service("operatorUserService")
 @Service(version = "1.0.0",protocol = "dubbo")
+
+@RefreshScope
 public class OperatorUserServiceImpl extends ServiceImpl<OperatorUserMapper, OperatorUser> implements IOperatorUserService{
+
+
+    @Value("${gateway.secret}")
+    private String secret;
 
     //根据name进行分页数据查询
     @Override
@@ -70,10 +82,25 @@ public class OperatorUserServiceImpl extends ServiceImpl<OperatorUserMapper, Ope
             return result;
         }
 
+        //生成jwt令牌
+        Map<String,Object> tokenInfo = Maps.newHashMap();
+        tokenInfo.put("loginName",user.getLoginname());
+        String token = null;
+        try{
+            //JWTUtil 是restkeeper_common提供的工具类
+            token = JWTUtil.createJWTByObj(tokenInfo,secret);
+        }catch (Exception e){
+            log.error("加密失败"+e.getMessage());
+            result.setStatus(ResultCode.error);
+            result.setDesc("生成令牌失败");
+            return result;
+        }
+
         //返回结果
         result.setStatus(ResultCode.success);
         result.setDesc("ok");
         result.setData(user);
+        result.setToken(token);
         return result;
     }
 }
