@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
  * 企业账号管理
  * </p>
  */
+
 @Data
 @Accessors(chain = true)
 @TableName(value = "t_enterprise_account")
@@ -68,4 +69,13 @@ public class EnterpriseAccount implements Serializable {
     @ApiModelProperty(value = "最后更新时间")
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime lastUpdateTime;
+
+
+    @ApiModelProperty(value = "是否删除 1 删除 0 未删除")
+/**
+ * value: 默认的原值
+ * delval: 删除后的值
+ */
+    @TableLogic(value = "0", delval = "1")
+    private Integer isDeleted;
 }

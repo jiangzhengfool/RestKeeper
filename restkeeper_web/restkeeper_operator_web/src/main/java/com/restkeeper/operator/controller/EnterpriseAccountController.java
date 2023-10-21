@@ -147,4 +147,14 @@ public class EnterpriseAccountController {
             return result;
         }
     }
+
+    /**
+     * 根据id删除
+     */
+    @ApiOperation(value = "账户删除")
+    @ApiImplicitParam(paramType = "query", name = "id", value = "主键", required = true, dataType = "String")
+    @DeleteMapping(value = "/deleteById/{id}")
+    public boolean delete(@PathVariable(value = "id") String id) {
+        return enterpriseAccountService.removeById(id);
+    }
 }
