@@ -5,6 +5,7 @@ import com.restkeeper.operator.service.IEnterpriseAccountService;
 import com.restkeeper.response.vo.AddEnterpriseAccountVO;
 import com.restkeeper.response.vo.PageVO;
 import com.restkeeper.response.vo.UpdateEnterpriseAccountVO;
+import com.restkeeper.utils.AccountStatus;
 import com.restkeeper.utils.Result;
 import com.restkeeper.utils.ResultCode;
 import io.swagger.annotations.Api;
@@ -166,5 +167,20 @@ public class EnterpriseAccountController {
     @GetMapping(value = "/recovery/{id}")
     public boolean recovery(@PathVariable("id") String id) {
         return enterpriseAccountService.recovery(id);
+    }
+
+    /**
+     * 帐号禁用
+     *
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "禁止使用")
+    @ApiImplicitParam(paramType = "path", name = "id", value = "主键", required = true, dataType = "String")
+    @GetMapping(value = "/forbidden/{id}")
+    public boolean forbidden(@PathVariable("id") String id) {
+        EnterpriseAccount enterpriseAccount = enterpriseAccountService.getById(id);
+        enterpriseAccount.setStatus(AccountStatus.Forbidden.getStatus());
+        return enterpriseAccountService.updateById(enterpriseAccount);
     }
 }
