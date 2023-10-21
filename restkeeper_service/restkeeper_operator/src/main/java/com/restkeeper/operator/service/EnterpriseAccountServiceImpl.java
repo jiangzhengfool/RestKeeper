@@ -1,15 +1,22 @@
 package com.restkeeper.operator.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.restkeeper.operator.config.RabbitMQConfig;
 import com.restkeeper.operator.entity.EnterpriseAccount;
 import com.restkeeper.operator.mapper.EnterpriseAccountMapper;
+import com.restkeeper.sms.SmsObject;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.Service;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +27,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RefreshScope
 public class EnterpriseAccountServiceImpl extends ServiceImpl<EnterpriseAccountMapper, EnterpriseAccount> implements IEnterpriseAccountService {
 
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Value("${sms.operator.signName}")
+    private String signName;
+
+    @Value("${sms.operator.templateCode}")
+    private String templateCode;
 
     /**
      * 支持按照企业名称模糊查询及分页支持
@@ -111,10 +127,26 @@ public class EnterpriseAccountServiceImpl extends ServiceImpl<EnterpriseAccountM
             }
             account.setPassword(Md5Crypt.md5Crypt(newPwd.getBytes()));
             this.updateById(account);
+
+            sendMessage(account.getPhone(), account.getShopId(), newPwd);
         } catch (Exception ex) {
             flag = false;
             throw ex;
         }
         return flag;
+    }
+
+
+    //发送短信
+    private void sendMessage(String phone, String shopId, String pwd) {
+        SmsObject smsObject = new SmsObject();
+        smsObject.setPhoneNumber(phone);
+        smsObject.setSignName(signName);
+        smsObject.setTemplateCode(templateCode);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("shopId", shopId);
+        jsonObject.put("password", pwd);
+        smsObject.setTemplateJsonParam(jsonObject.toJSONString());
+        rabbitTemplate.convertAndSend(RabbitMQConfig.ACCOUNT_QUEUE, JSON.toJSONString(smsObject));
     }
 }
