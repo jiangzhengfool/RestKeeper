@@ -1,7 +1,7 @@
 #设置dubbo支持
 dubbo:
   registry:
-    address: spring-cloud://192.168.200.128
+    address: spring-cloud://127.0.0.1
   cloud:
     subscribed-services: operator-dubbo-provider
   protocols:

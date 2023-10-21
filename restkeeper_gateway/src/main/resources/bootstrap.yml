@@ -7,9 +7,9 @@ spring:
     # 使用 Naoos 作为服务注册发现
     nacos:
       discovery:
-        server-addr: 192.168.60.53:8849
+        server-addr: 127.0.0.1:8849
       config:
-        server-addr: 192.168.60.53:8849
+        server-addr: 127.0.0.1:8849
         file-extension: yml
         prefix: gateway
         shared-dataids: common.yml

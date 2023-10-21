@@ -7,7 +7,7 @@ dubbo:
       port: -1
       serialization: kryo
   registry:
-    address: spring-cloud://192.168.60.53
+    address: spring-cloud://127.0.0.1
   consumer:
     timeout: 600000
 management:
@@ -18,3 +18,6 @@ management:
 logging:
   level:
     com.restkeeper: debug
+gateway:
+  excludedUrls: /login,/operator-web/login,/store-web/login
+  secret: f!TMw@Z#O&g37w1t
