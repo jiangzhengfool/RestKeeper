@@ -83,4 +83,10 @@ public class EnterpriseAccountServiceImpl extends ServiceImpl<EnterpriseAccountM
         }
         return shopId;
     }
+
+    @Override
+    @Transactional
+    public boolean recovery(String id) {
+        return this.getBaseMapper().recovery(id);
+    }
 }

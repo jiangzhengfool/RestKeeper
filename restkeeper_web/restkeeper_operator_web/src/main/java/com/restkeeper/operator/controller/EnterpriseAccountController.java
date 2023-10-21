@@ -157,4 +157,14 @@ public class EnterpriseAccountController {
     public boolean delete(@PathVariable(value = "id") String id) {
         return enterpriseAccountService.removeById(id);
     }
+
+    /**
+     * 数据还原
+     */
+    @ApiOperation(value = "数据恢复")
+    @ApiImplicitParam(paramType = "query", name = "id", value = "主键", required = true, dataType = "String")
+    @GetMapping(value = "/recovery/{id}")
+    public boolean recovery(@PathVariable("id") String id) {
+        return enterpriseAccountService.recovery(id);
+    }
 }

@@ -23,4 +23,7 @@ public interface IEnterpriseAccountService extends IService<EnterpriseAccount> {
      * @return
      */
     boolean add(EnterpriseAccount account);
+
+
+    boolean recovery(String id);
 }
