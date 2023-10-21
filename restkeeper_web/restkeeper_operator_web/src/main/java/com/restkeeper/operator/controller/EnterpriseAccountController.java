@@ -5,6 +5,7 @@ import com.restkeeper.operator.service.IEnterpriseAccountService;
 import com.restkeeper.response.vo.AddEnterpriseAccountVO;
 import com.restkeeper.response.vo.PageVO;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.Reference;
@@ -69,5 +70,15 @@ public class EnterpriseAccountController {
         }
 
         return enterpriseAccountService.add(enterpriseAccount);
+    }
+
+    /**
+     * 根据id查询
+     */
+    @ApiOperation(value = "账户查看")
+    @ApiImplicitParam(paramType = "path", name = "id", value = "主键", required = true, dataType = "String")
+    @GetMapping(value = "/getById/{id}")
+    public EnterpriseAccount getById(@PathVariable("id") String id) {
+        return enterpriseAccountService.getById(id);
     }
 }
