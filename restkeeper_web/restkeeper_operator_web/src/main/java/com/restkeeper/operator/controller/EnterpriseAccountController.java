@@ -4,6 +4,7 @@ import com.restkeeper.operator.entity.EnterpriseAccount;
 import com.restkeeper.operator.service.IEnterpriseAccountService;
 import com.restkeeper.response.vo.AddEnterpriseAccountVO;
 import com.restkeeper.response.vo.PageVO;
+import com.restkeeper.response.vo.ResetPwdVO;
 import com.restkeeper.response.vo.UpdateEnterpriseAccountVO;
 import com.restkeeper.utils.AccountStatus;
 import com.restkeeper.utils.Result;
@@ -182,5 +183,15 @@ public class EnterpriseAccountController {
         EnterpriseAccount enterpriseAccount = enterpriseAccountService.getById(id);
         enterpriseAccount.setStatus(AccountStatus.Forbidden.getStatus());
         return enterpriseAccountService.updateById(enterpriseAccount);
+    }
+
+
+    /**
+     * 重置密码
+     */
+    @ApiOperation(value = "重置密码")
+    @PutMapping(value = "/resetPwd")
+    public boolean resetPwd(@RequestBody ResetPwdVO resetPwdVO) {
+        return enterpriseAccountService.resetPwd(resetPwdVO.getId(), resetPwdVO.getPwd());
     }
 }

@@ -26,4 +26,13 @@ public interface IEnterpriseAccountService extends IService<EnterpriseAccount> {
 
 
     boolean recovery(String id);
+
+    /**
+     * 重置密码
+     *
+     * @param id
+     * @param password
+     * @return
+     */
+    boolean resetPwd(String id, String password);
 }

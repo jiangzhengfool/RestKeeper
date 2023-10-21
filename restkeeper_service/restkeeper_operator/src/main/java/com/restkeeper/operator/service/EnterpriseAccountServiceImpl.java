@@ -89,4 +89,32 @@ public class EnterpriseAccountServiceImpl extends ServiceImpl<EnterpriseAccountM
     public boolean recovery(String id) {
         return this.getBaseMapper().recovery(id);
     }
+
+
+    //重置密码
+    @Override
+    @Transactional
+    public boolean resetPwd(String id, String password) {
+        boolean flag = true;
+        try {
+            EnterpriseAccount account = this.getById(id);
+            if (account == null) {
+                return false;
+            }
+            String newPwd;
+            //如果设置了要重置密码
+            if (StringUtils.isNotEmpty(password)) {
+                newPwd = password;
+            } else {
+                //如果没有设置要重置密码
+                newPwd = RandomStringUtils.randomNumeric(6);
+            }
+            account.setPassword(Md5Crypt.md5Crypt(newPwd.getBytes()));
+            this.updateById(account);
+        } catch (Exception ex) {
+            flag = false;
+            throw ex;
+        }
+        return flag;
+    }
 }
