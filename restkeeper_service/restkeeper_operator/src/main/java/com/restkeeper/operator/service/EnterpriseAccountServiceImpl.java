@@ -6,10 +6,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Maps;
+import com.restkeeper.constants.SystemCode;
 import com.restkeeper.operator.config.RabbitMQConfig;
 import com.restkeeper.operator.entity.EnterpriseAccount;
 import com.restkeeper.operator.mapper.EnterpriseAccountMapper;
 import com.restkeeper.sms.SmsObject;
+import com.restkeeper.utils.*;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
@@ -19,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 /**
  * 企业账号管理 服务实现类
@@ -33,6 +38,9 @@ public class EnterpriseAccountServiceImpl extends ServiceImpl<EnterpriseAccountM
 
     @Value("${sms.operator.signName}")
     private String signName;
+
+    @Value("${gateway.secret}")
+    private String secret;
 
     @Value("${sms.operator.templateCode}")
     private String templateCode;
@@ -74,6 +82,7 @@ public class EnterpriseAccountServiceImpl extends ServiceImpl<EnterpriseAccountM
             //密码随机6位
             String pwd = RandomStringUtils.randomNumeric(6);
             account.setPassword(Md5Crypt.md5Crypt(pwd.getBytes()));
+
             this.save(account);
         } catch (Exception ex) {
             flag = false;
@@ -148,5 +157,74 @@ public class EnterpriseAccountServiceImpl extends ServiceImpl<EnterpriseAccountM
         jsonObject.put("password", pwd);
         smsObject.setTemplateJsonParam(jsonObject.toJSONString());
         rabbitTemplate.convertAndSend(RabbitMQConfig.ACCOUNT_QUEUE, JSON.toJSONString(smsObject));
+    }
+
+    /**
+     * 用户登录
+     *
+     * @param shopId
+     * @param telphone
+     * @param loginPass
+     * @return
+     */
+    @Override
+    public Result login(String shopId, String telphone, String loginPass) {
+
+        Result result = new Result();
+
+        //参数校验
+        if (StringUtils.isEmpty(shopId)) {
+            result.setStatus(ResultCode.error);
+            result.setDesc("用户名为空");
+            return result;
+        }
+
+        if (StringUtils.isEmpty(loginPass)) {
+            result.setStatus(ResultCode.error);
+            result.setDesc("密码不存在");
+            return result;
+        }
+
+        //查询用户信息
+        QueryWrapper<EnterpriseAccount> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(EnterpriseAccount::getPhone, telphone);
+        queryWrapper.lambda().eq(EnterpriseAccount::getShopId, shopId);
+        //未禁用状态
+        queryWrapper.lambda().notIn(EnterpriseAccount::getStatus, AccountStatus.Forbidden.getStatus());
+        EnterpriseAccount enterpriseAccount = this.getOne(queryWrapper);
+        if (enterpriseAccount == null) {
+            result.setStatus(ResultCode.error);
+            result.setDesc("账号不存在");
+            return result;
+        }
+
+        //密码校验
+        String salts = MD5CryptUtil.getSalts(enterpriseAccount.getPassword());
+        if (!Md5Crypt.md5Crypt(loginPass.getBytes(), salts).equals(enterpriseAccount.getPassword())) {
+            result.setStatus(ResultCode.error);
+            result.setDesc("密码不正确");
+            return result;
+        }
+
+        //生成令牌
+        Map<String, Object> tokenInfo = Maps.newHashMap();
+        tokenInfo.put("shopId", enterpriseAccount.getShopId());
+        tokenInfo.put("loginName", enterpriseAccount.getEnterpriseName());
+        tokenInfo.put("userType", SystemCode.USER_TYPE_SHOP); // 集团管理用户
+        String token = null;
+        try {
+            token = JWTUtil.createJWTByObj(tokenInfo, secret);
+        } catch (Exception e) {
+            log.error("加密失败" + e.getMessage());
+            result.setStatus(ResultCode.error);
+            result.setDesc("加密失败");
+            return result;
+        }
+        result.setStatus(ResultCode.success);
+        result.setDesc("ok");
+        result.setData(enterpriseAccount);
+        result.setToken(token);
+
+        return result;
     }
 }

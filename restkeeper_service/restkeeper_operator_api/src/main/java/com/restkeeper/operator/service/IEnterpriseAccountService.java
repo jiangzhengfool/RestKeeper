@@ -3,6 +3,7 @@ package com.restkeeper.operator.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.restkeeper.operator.entity.EnterpriseAccount;
+import com.restkeeper.utils.Result;
 
 public interface IEnterpriseAccountService extends IService<EnterpriseAccount> {
 
@@ -11,7 +12,7 @@ public interface IEnterpriseAccountService extends IService<EnterpriseAccount> {
      *
      * @param pageNum
      * @param pageSize
-     * @param name
+     * @param
      * @return
      */
     IPage<EnterpriseAccount> queryPageByName(int pageNum, int pageSize, String enterpriseName);
@@ -35,4 +36,14 @@ public interface IEnterpriseAccountService extends IService<EnterpriseAccount> {
      * @return
      */
     boolean resetPwd(String id, String password);
+
+    /**
+     * 根据商铺id，账号，密码校验登录信息
+     *
+     * @param shopId
+     * @param telphone
+     * @param loginPass
+     * @return
+     */
+    Result login(String shopId, String telphone, String loginPass);
 }
