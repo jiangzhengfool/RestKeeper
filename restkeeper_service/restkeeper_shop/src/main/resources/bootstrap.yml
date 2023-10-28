@@ -1,6 +1,8 @@
 spring:
   application:
-    name: restkeeper-mq
+    name: shop-dubbo-provider
+  profiles:
+    active: dev
   cloud:
     nacos:
       discovery:
